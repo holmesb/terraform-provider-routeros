@@ -7,9 +7,9 @@ description: |-
 
 # Resource: routeros_ip_firewall_filter
 
-IP firewall filter rule. Ordered top-down by `position` (sort key, not
-identity). Position is persisted on the device via [tf:pos=N] in the
-comment so destroy+apply rebuilds the same order.
+IP firewall filter rule. `position` is a sort key (not identity) ordering this rule only relative to other
+rules managed by the same apply - it is TF-state-only and never written to the device, so it cannot order
+relative to rules from a different Terraform state. Use `place_before` (a RouterOS `.id`) for that instead.
 Safety: refuses an unconditional chain=input/forward action=drop|reject|
 tarpit rule unless `lockout_ack = true`.
 
@@ -140,6 +140,7 @@ This resource supports the following arguments:
 * `per_connection_classifier` - (Optional) Type: `string`.
 * `port` - (Optional) Type: `string`.
 * `position` - (Optional) Type: `int`. Sort key for placement in the ordered chain. Lower = higher in the chain. Persisted on the device via a [tf:pos=N] prefix in the comment so destroy+apply rebuilds the same order.
+* `place_before` - (Optional) Type: `string`. Moves rule to before existing rule specified by a RouterOS `.id` (eg `*3`). Mutually exclusive with `position`. Typically resolved via a `data "routeros_ip_firewall_filter"` lookup. 
 * `priority` - (Optional) Type: `string`.
 * `protocol` - (Optional) Type: `string`.
 * `psd` - (Optional) Type: `string`.
